@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="blog">
+	<insert id="insert" parameterType="blogvo">
+		<![CDATA[
+			insert into blog
+		]]>
+		<choose> 
+			<when test="groupNo == null">
+				<![CDATA[
+				values( seq_blog.nextval, #{title }, #{content }, sysdate, 0, nvl((select max(g_no) from blog),0) + 1, 1, 1, #{userNo })
+				]]>
+			</when>
+			<otherwise>
+				<![CDATA[
+				values( seq_blog.nextval, #{title }, #{content }, sysdate, 0, #{groupNo }, #{orderNo }, #{depth }, #{userNo } )
+				]]>
+			</otherwise>
+		</choose>
+	</insert>
+	<delete id="delete" parameterType="blogvo">
+		<![CDATA[
+		delete
+		from guestbook
+		where no=#{no }
+		and password=#{password }
+		]]>
+	</delete>
+	<update id="increaseGroupOrder" parameterType="blogvo">
+		<![CDATA[
+		update blog set o_no = o_no + 1 where g_no = #{groupNo} and o_no > #{orderNo}
+		]]>
+	</update>
+	<update id="updateHit" parameterType="long">
+		<![CDATA[
+		update blog set hit = hit + 1 where no = #{blogNo }
+		]]>
+	</update>
+	<update id="update" parameterType="blogvo">
+		<![CDATA[
+		update blog set title=#{title }, content=#{content } where no=#{no } and member_no=#{userNo }
+		]]>
+	</update>
+	<select id="getTotalCount" parameterType="string" resultType="int">
+		<![CDATA[
+		select count(*)
+		  from blog
+		]]>		  
+		<if test="_parameter != null and _parameter !=''">
+			<![CDATA[
+			where title like '%${_parameter }%'
+			   or content like '%${_parameter }%'
+			]]>	
+		</if>	  
+	</select>
+	<select id="getlist" parameterType="map" resultType="blogvo">
+		<![CDATA[
+			select * 
+			from ( select no, title, hit, reg_date, depth, name, member_no, rownum as rn
+		           from( select a.no, a.title, a.hit, to_char(a.reg_date, 'yyyy-mm-dd hh24:mi:ss') as reg_date, a.depth, b.name, a.member_no
+	                     from blog a, member b
+                    	 where a.member_no = b.no
+		]]>
+		<if test="keyword != ''">
+			and (title like #{keyword } or content like #{keyword })
+		</if>
+        <![CDATA[            	 
+                         order by g_no desc, o_no asc ))
+	        where (#{page }-1)*#{size }+1 <= rn and rn <= #{page }*#{size }
+		]]>
+	</select>
+	<select id="get" parameterType="long" resultType="blogvo">
+		<![CDATA[
+			select no, title, content, g_no, o_no, depth, member_no
+			from blog
+			where no = #{no }
+		]]>
+	</select>
+</mapper>
