@@ -28,7 +28,7 @@ public class UserController {
 	@RequestMapping(value="/join",method=RequestMethod.POST)
 	public String join(@ModelAttribute MemberVo vo) {
 		boolean result = memberSerivce.join(vo);
-		
+		LOG.debug(result);
 		return "redirect:/user/joinsuccess";
 	}
 	
