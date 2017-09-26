@@ -178,6 +178,16 @@
 					<warSourceDirectory>WebApp</warSourceDirectory>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>tomcat-maven-plugin</artifactId>
+				<configuration>
+					<url>http://127.0.0.1/manager/text</url>
+					<path>/jblog</path>
+					<username>admin</username>
+					<password>h1735</password>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
